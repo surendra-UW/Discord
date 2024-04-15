@@ -6,7 +6,6 @@ import {Role} from "@prisma/client"
 
 export async function POST (req: Request) {
 
-    console.log(req);
     try {
         const {name, imageUrl, s3Url} = await req.json();
         const profile = await currentProfile();
