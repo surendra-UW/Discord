@@ -33,6 +33,7 @@ model Server {
   id String @id @default(uuid())
   name String 
   imageUrl String @db.Text
+  s3Url String @db.Text
   inviteCode String @db.Text
 
   profileId String  

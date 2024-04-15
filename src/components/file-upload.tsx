@@ -3,6 +3,7 @@ import upload from '../../public/cloud-upload.svg';
 import Image from "next/image";
 import { Button } from "./ui/button";
 import AWS from 'aws-sdk';
+import {X} from 'lucide-react'
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
@@ -16,12 +17,41 @@ interface FileUploadProps {
     endpoint: "messageFile" | "serverImage" 
 }
 
-export const FileUpload = () => {
+export const FileUpload = ({ handleImageUpload, setS3Url }:any) => {
     const [selectedFile, setSelectedFile] = useState<File|null>(null);
     const [fileUploadStatus, setFileUploadStatus] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
     const fileInputRef = useRef(null);
+    const VALID_IMAGE_EXTENSION = ['jpg', 'png', 'jpeg', 'PNG'];
+  
 
-    const handleFileChange = (event: any) => {
+  const previewComponent = () => {
+    return (
+      <div className="relative h-20 w-20">
+        <Image 
+        fill
+        src={imageUrl}
+        alt="Server Image"
+        className="rounded-full"
+        />
+        <Button 
+        onClick={() => {
+          setImageUrl('');
+          setSelectedFile(null);
+          setFileUploadStatus('');
+          handleImageUpload('');
+          setS3Url('');
+        }}
+        className="bg-rose-500 text-white rounded-full absolute top-0 right-0 p-1"
+        type="button"
+        >
+        <X className="h-4 w-5"></X>
+        </Button>
+      </div>
+    );
+  }
+
+  const handleFileChange = (event: any) => {
         const file: File = event.target.files[0];
         setSelectedFile(file);
         console.log(process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID);
@@ -45,14 +75,26 @@ export const FileUpload = () => {
         console.log(params);
         const response = await s3.upload(params).promise();
         console.log(response)
+        setS3Url(response.Location);
         setFileUploadStatus('Upload successful!');
+
+        const fileType = selectedFile?.name.split('.').pop();
+        if(selectedFile) {
+          if(fileType && VALID_IMAGE_EXTENSION.includes(fileType) ) {
+            const fileReader = new FileReader();
+            fileReader.onload = (event) => {
+              setImageUrl(event.target?.result as string);
+              handleImageUpload(event.target?.result);
+            }
+            fileReader.readAsDataURL(selectedFile);
+        }
+      }
+        // If the uploaded file is image return the html with image
+
       } catch (error) {
         console.error(error);
         setFileUploadStatus('Upload failed. Please try again.');
       }
-    //   setTimeout(() => {
-    //     setFileUploadStatus('Uploaded successfully!');
-    //   }, 2000);
     } else {
       setFileUploadStatus('Please select a file to upload.');
     }
@@ -64,6 +106,10 @@ export const FileUpload = () => {
         input.click();
     }
   };
+
+  if (imageUrl) {
+    return previewComponent();
+  }
 
   return (
     <div className="file-upload flex flex-col items-center justify-center p-10 border border-gray-200 rounded-lg">
