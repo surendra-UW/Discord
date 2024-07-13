@@ -1,36 +1,32 @@
-import { currentProfile } from "@/lib/current-profile"
-import { NextResponse } from "next/server";
+import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db";
-import { v4 as uuidv4} from "uuid";
+import { NextResponse } from "next/server";
 
-export async function PATCH (
-    req: Request,
-    {params}: {params: {serverId: string}},
-) {
-    try{ 
+export async function PATCH (req: Request, 
+    {params}: {params: {serverId: string}}) {
+
+    try {
+        const {name, imageUrl} = await req.json();
         const profile = await currentProfile();
 
         if (!profile) {
-            return new NextResponse("unAuthorized", {status: 401}); 
-        }
-
-        if (!params.serverId) {
-            return new NextResponse("Server Id Missing", {status: 400});
+            return new NextResponse("UnAuthorized", {status: 401});
         }
 
         const server = await db.server.update({
-            where: {
-                id: params.serverId,
+            where:{
                 profileId: profile.id,
-
+                id: params.serverId
             },
             data: {
-                inviteCode: uuidv4(),
+                name,
+                imageUrl
             }
         });
 
-        return NextResponse.json(server);
+        return NextResponse.json(server, {status: 200});
     } catch (error) {
-
+        console.error("[SERVER_ID_PATCH]", error);
+        return new NextResponse("Internal Server Error", {status: 500});
     }
-}
+} 

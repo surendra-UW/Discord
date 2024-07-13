@@ -8,10 +8,8 @@ import {
 } from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
-import { FileUpload } from '../file-upload';
+import { useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import { useModal } from '@/hooks/use-model-store';
 import { Label } from '../ui/label';
 import { Check, Copy, RefreshCw } from 'lucide-react';
@@ -39,7 +37,7 @@ export const InviteModal = () => {
     const onNew = async () => {
         try{
             setLoading(true);
-            const response = await axios.patch(`api/servers/${server.id}/invite-code`);
+            const response = await axios.patch(`/api/servers/${server.id}/invite-code`);
 
             onOpen("invite", {server: response.data});
         }catch(error) {

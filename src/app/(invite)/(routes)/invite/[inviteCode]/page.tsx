@@ -32,6 +32,7 @@ const InviteCodePage = async ({params}: InviteCodePageProps) => {
         }
     });
 
+    console.log('existing server is', existingServer);
     if (existingServer) {
         return redirect(`/servers/${existingServer.id}`);
     }

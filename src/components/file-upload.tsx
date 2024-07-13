@@ -17,10 +17,10 @@ interface FileUploadProps {
     endpoint: "messageFile" | "serverImage" 
 }
 
-export const FileUpload = ({ handleImageUpload, setS3Url }:any) => {
+export const FileUpload = ({ handleImageUpload, setS3Url, image }:any) => {
     const [selectedFile, setSelectedFile] = useState<File|null>(null);
     const [fileUploadStatus, setFileUploadStatus] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
+    const [imageUrl, setImageUrl] = useState(image);
     const fileInputRef = useRef(null);
     const VALID_IMAGE_EXTENSION = ['jpg', 'png', 'jpeg', 'PNG'];
   
